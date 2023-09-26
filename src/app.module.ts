@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ENV } from './common/config/config';
+import { TypeModule } from './modules/type/type.module';
+import { TeacherModule } from './modules/teacher/teacher.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { ENV } from './common/config/config';
       autoLoadModels: true,
       pool: { min: 10, max: 30 },
     }),
+    TypeModule,
+    TeacherModule,
   ],
   controllers: [],
   providers: [],

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 
 export class BaseDtoGroup {
   static readonly CREATE = 'create';
@@ -26,6 +26,17 @@ export class BaseDto {
     ],
   })
   id: string | any;
+
+  @ApiProperty({
+    description: 'A boolean indicating the status.',
+    type: 'boolean',
+    example: true,
+  })
+  @IsOptional({ groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE] })
+  @IsBoolean({
+    groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE],
+  })
+  status: boolean;
 
   @IsOptional({ groups: [BaseDtoGroup.CREATE] })
   @IsUUID('4', { groups: [BaseDtoGroup.CREATE] })

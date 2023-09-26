@@ -40,7 +40,7 @@ export abstract class BaseService<
     });
 
     if (!instance) {
-      throw CommonException.NotFound();
+      throw CommonException.NotFound(this.model.tableName);
     }
 
     return instance.toJSON();
@@ -61,7 +61,7 @@ export abstract class BaseService<
     });
 
     if (!instance) {
-      throw CommonException.NotFound();
+      throw CommonException.NotFound(this.model.tableName);
     }
 
     return (await instance.update(data)).toJSON();
@@ -69,7 +69,6 @@ export abstract class BaseService<
 
   async deleteById(id: any) {
     const instance = await this.model.findOne({
-      // where: { conditions: {}, path: 'id', value: id },
       where: { id },
       attributes: {
         exclude: [
@@ -83,10 +82,10 @@ export abstract class BaseService<
     });
 
     if (!instance) {
-      throw CommonException.NotFound();
+      throw CommonException.NotFound(this.model.tableName);
     }
 
-    await instance.destroy();
+    await instance.update({ status: true } as Partial<TModelAttributes>);
     return { id };
   }
 }

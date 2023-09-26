@@ -33,7 +33,6 @@ export class CommonException extends HttpException {
   }
 
   public static UnknownError(
-    data?: any,
     message = 'Unknown error',
     statusCode?: HttpStatus,
   ) {
@@ -49,18 +48,18 @@ export class CommonException extends HttpException {
     );
   }
 
-  static AllreadyExist(message) {
+  static AllreadyExist(item?: string) {
     return new CommonException(
       ERROR_CODES.BASE + 2,
-      `Already exist , message: ${message}`,
+      item ? `${item} already exists` : 'Already exists',
       HttpStatus.BAD_REQUEST,
     );
   }
 
-  public static NotFound() {
+  public static NotFound(item?: string) {
     return new CommonException(
       ERROR_CODES.BASE + 4,
-      'Not found',
+      item ? `${item} not found` : 'Not found',
       HttpStatus.NOT_FOUND,
     );
   }

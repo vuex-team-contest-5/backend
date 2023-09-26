@@ -16,14 +16,17 @@ export class PGBaseModel<
 > extends Model<TModelAttributes, TCreationAttributes> {
   @PrimaryKey
   @IsUUID(ENV.DB.POSTGRES.UUID_VERSION)
-  @Column({ type: DataTypes.UUID })
+  @Column({ type: DataTypes.UUID, allowNull: false })
   declare id: string;
+
+  @Column({ allowNull: false, defaultValue: true })
+  declare status: boolean;
 
   @CreatedAt
   declare createdAt: string;
 
   @Column
-  createdBy?: string;
+  declare createdBy?: string;
 
   @UpdatedAt
   declare updatedAt?: string;
@@ -32,5 +35,5 @@ export class PGBaseModel<
   declare deletedAt?: string;
 
   @Column
-  deletedBy?: string;
+  declare deletedBy?: string;
 }

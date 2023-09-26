@@ -31,7 +31,7 @@ export class PagingDto<T = any> {
   id?: string;
 
   @ApiProperty({ type: 'number', example: 10 })
-  @Transform((value) => Number(value))
+  @Transform(({ value }) => Number(value))
   @IsNumber(
     {
       allowInfinity: false,
@@ -45,7 +45,7 @@ export class PagingDto<T = any> {
   limit? = 10;
 
   @ApiProperty({ type: 'number', example: 1 })
-  @Transform((value) => Number(value))
+  @Transform(({ value }) => Number(value))
   @IsNumber(
     {
       allowInfinity: false,
@@ -72,6 +72,7 @@ export class PagingDto<T = any> {
   @IsString({ groups: [BaseDtoGroup.PAGINATION] })
   orderBy?: keyof T;
 
+  @ApiProperty({ type: 'string', example: 'ASC', required: false })
   @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
   @IsEnum(QuerySortTypeEnum, { groups: [BaseDtoGroup.PAGINATION] })
   orderType?: QuerySortType = 'ASC';
