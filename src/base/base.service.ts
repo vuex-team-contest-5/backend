@@ -85,7 +85,7 @@ export abstract class BaseService<
       throw CommonException.NotFound(this.model.tableName);
     }
 
-    await instance.update({ status: true } as Partial<TModelAttributes>);
+    await instance.update({ status: false } as Partial<TModelAttributes>);
     return { id };
   }
 }

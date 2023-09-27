@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { TypeModel } from './type.model';
 import { BaseService } from '../../base/base.service';
 import { Sequelize } from 'sequelize';
+import { TeacherModel } from '../teacher/teacher.model';
 
 @Injectable()
 export class TypeService extends BaseService<TypeDto, TypeDto> {
@@ -31,12 +32,12 @@ export class TypeService extends BaseService<TypeDto, TypeDto> {
           'deletedBy',
         ],
       },
-      // include: [
-      //   {
-      //     model: TeacherModel,
-      //     attributes: [],
-      //   },
-      // ],
+      include: [
+        {
+          model: TeacherModel,
+          attributes: [],
+        },
+      ],
       paranoid: false,
       subQuery: false,
       group: ['TypeModel.id'],
