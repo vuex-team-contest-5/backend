@@ -19,7 +19,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new LoggingInterceptor());
 
-  await app.listen(ENV.HTTP_PORT, ENV.HTTP_HOST);
+  await app.listen(ENV.HTTP_PORT);
   console.log(`app run on port: ${ENV.HTTP_PORT}`);
 }
 
