@@ -23,7 +23,6 @@ import { TeacherModel } from './modules/teacher/teacher.model';
       autoLoadModels: true,
       logging: false,
       pool: { min: 10, max: 30 },
-      ssl: true,
       dialectOptions: {
         ssl: {
           require: true,
