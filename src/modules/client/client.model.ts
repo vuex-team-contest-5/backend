@@ -7,15 +7,13 @@ import {
 } from 'sequelize-typescript';
 import { PGBaseModel } from '../../base/base.model';
 import { PG_TABLE_NAMES } from '../../common/constant/tables';
-import { TeacherDto } from './teacher.dto';
+import { ClientDto } from './client.dto';
 import { DataTypes } from 'sequelize';
-import { TypeModel } from '../type/type.model';
-import { TypeDto } from '../type/type.dto';
-import { ClientModel } from '../client/client.model';
-import { ClientDto } from '../client/client.dto';
+import { TeacherModel } from '../teacher/teacher.model';
+import { TeacherDto } from '../teacher/teacher.dto';
 
-@Table({ tableName: PG_TABLE_NAMES.TEACHER, underscored: true })
-export class TeacherModel extends PGBaseModel<TeacherDto, TeacherDto> {
+@Table({ tableName: PG_TABLE_NAMES.CLIENT, underscored: true })
+export class ClientModel extends PGBaseModel<ClientDto, ClientDto> {
   @Column({ allowNull: false })
   firstName: string;
 
@@ -35,24 +33,27 @@ export class TeacherModel extends PGBaseModel<TeacherDto, TeacherDto> {
   birthDate: string;
 
   @Column({ allowNull: false })
-  workDay: string;
+  servicePrice: string;
 
-  @Column({ type: DataTypes.TEXT, allowNull: false })
-  info: string;
+  @Column({ type: DataTypes.DATEONLY, allowNull: false })
+  startedAt: string;
 
   @Column({ allowNull: false })
-  isMale: boolean;
+  period: number;
 
   @Column
   imageName: string;
 
-  @ForeignKey(() => TypeModel)
+  @ForeignKey(() => TeacherModel)
   @Column({ type: DataTypes.UUID, allowNull: false })
-  typeId: string;
+  teacherId: string;
 
-  @BelongsTo(() => TypeModel)
-  type?: TypeDto;
+  @BelongsTo(() => TeacherModel)
+  teacher?: TeacherDto;
 
-  @HasMany(() => ClientModel)
-  client: ClientDto[];
+  // @HasMany(() => ChatModel)
+  // chat: ChatDto[];
+
+  // @HasMany(() => OrderModel)
+  // order: OrderDto[];
 }

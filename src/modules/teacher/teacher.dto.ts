@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 import { PagingDto } from '../../common/dto/paging.dto';
 import { regexps } from '../../common/constant/regex';
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 
 export class TeacherDtoGroup extends BaseDtoGroup {}
 

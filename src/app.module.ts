@@ -4,8 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ENV } from './common/config/config';
 import { TypeModule } from './modules/type/type.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
-import { TypeModel } from './modules/type/type.model';
-import { TeacherModel } from './modules/teacher/teacher.model';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({
   imports: [
@@ -29,10 +28,10 @@ import { TeacherModel } from './modules/teacher/teacher.model';
           rejectUnauthorized: false,
         },
       },
-      models: [TypeModel, TeacherModel],
     }),
     TypeModule,
     TeacherModule,
+    ClientModule,
   ],
   controllers: [],
   providers: [],

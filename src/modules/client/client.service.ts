@@ -1,30 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../base/base.service';
-import { TeacherDto, TeacherPagingDto } from './teacher.dto';
+import { ClientDto, ClientPagingDto } from './client.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { TeacherModel } from './teacher.model';
-import { TypeService } from './../type/type.service';
-import { randomUUID } from 'crypto';
-import { CommonException } from '../../common/errors/common.error';
-import { TypeModel } from '../type/type.model';
-import { hashPassword } from '../../auth/bcrypt';
+import { ClientModel } from './client.model';
+import { TeacherService } from '../teacher/teacher.service';
 import { ImageService } from '../image/image.service';
 import { Sequelize } from 'sequelize-typescript';
-import { ClientModel } from '../client/client.model';
+import { CommonException } from '../../common/errors/common.error';
+import { randomUUID } from 'crypto';
+import { hashPassword } from '../../auth/bcrypt';
+import { TeacherModel } from '../teacher/teacher.model';
+import { TypeModel } from '../type/type.model';
 
 @Injectable()
-export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
+export class ClientService extends BaseService<ClientDto, ClientDto> {
   constructor(
-    @InjectModel(TeacherModel) model: typeof TeacherModel,
-    private typeService: TypeService,
+    @InjectModel(ClientModel) model: typeof ClientModel,
+    private teacherService: TeacherService,
     private readonly imageService: ImageService,
     private sequelize: Sequelize,
   ) {
     super(model);
   }
 
-  async create(data: TeacherDto, image?: Express.Multer.File) {
-    await this.typeService.findById(data.typeId);
+  async create(data: ClientDto, image?: Express.Multer.File) {
+    await this.teacherService.findById(data.teacherId);
 
     const userByPhoneNumber = await this.findByPhoneNumber(data.phoneNumber, [
       'id',
@@ -52,7 +52,7 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       attributes: {
         exclude: [
           'hashedPassword',
-          'typeId',
+          'teacherId',
           'createdAt',
           'createdBy',
           'updatedAt',
@@ -62,9 +62,11 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       },
       include: [
         {
-          model: TypeModel,
+          model: TeacherModel,
           attributes: {
             exclude: [
+              'hashedPassword',
+              'typeId',
               'createdAt',
               'createdBy',
               'updatedAt',
@@ -72,6 +74,20 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
               'deletedBy',
             ],
           },
+          include: [
+            {
+              model: TypeModel,
+              attributes: {
+                exclude: [
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+          ],
         },
       ],
     });
@@ -79,13 +95,13 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
     return instance.toJSON();
   }
 
-  async findAll(query: TeacherPagingDto): Promise<ResponsePaging<TeacherDto>> {
+  async findAll(query: ClientPagingDto): Promise<ResponsePaging<ClientDto>> {
     query.limit = Number(query.limit || 10);
     query.page = Number(query.page || 1);
 
     const filter = {};
-    if (query.typeId) {
-      filter['typeId'] = query.typeId;
+    if (query.teacherId) {
+      filter['teacherId'] = query.teacherId;
     }
 
     const instance = await this.model.findAndCountAll({
@@ -94,12 +110,9 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       limit: query.limit,
       offset: (query.page - 1) * query.limit,
       attributes: {
-        include: [
-          [Sequelize.literal('COUNT("TeacherModel"."id")::INTEGER'), 'count'],
-        ],
         exclude: [
           'hashedPassword',
-          'typeId',
+          'teacherId',
           'createdAt',
           'createdBy',
           'updatedAt',
@@ -109,9 +122,11 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       },
       include: [
         {
-          model: TypeModel,
+          model: TeacherModel,
           attributes: {
             exclude: [
+              'hashedPassword',
+              'typeId',
               'createdAt',
               'createdBy',
               'updatedAt',
@@ -119,29 +134,36 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
               'deletedBy',
             ],
           },
-        },
-        {
-          model: ClientModel,
-          attributes: [],
+          include: [
+            {
+              model: TypeModel,
+              attributes: {
+                exclude: [
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+          ],
         },
       ],
-      paranoid: false,
-      subQuery: false,
-      group: ['TeacherModel.id', 'type.id'],
     });
 
     return {
       meta: {
         limit: query.limit,
         currentPage: query.page,
-        totalPages: Math.ceil(instance.count.length / query.limit),
-        totalCount: instance.count.length,
+        totalPages: Math.ceil(instance.count / query.limit),
+        totalCount: instance.count,
       },
       data: instance.rows.map((row) => row.toJSON()),
     };
   }
 
-  async updateById(data: TeacherDto, image?: Express.Multer.File) {
+  async updateById(data: ClientDto, image?: Express.Multer.File) {
     const instance = await this.model.findOne({
       where: { id: data.id },
       attributes: {
@@ -157,9 +179,11 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       },
       include: [
         {
-          model: TypeModel,
+          model: TeacherModel,
           attributes: {
             exclude: [
+              'hashedPassword',
+              'typeId',
               'createdAt',
               'createdBy',
               'updatedAt',
@@ -167,6 +191,20 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
               'deletedBy',
             ],
           },
+          include: [
+            {
+              model: TypeModel,
+              attributes: {
+                exclude: [
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+          ],
         },
       ],
     });
@@ -175,8 +213,8 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       throw CommonException.NotFound(this.model.tableName);
     }
 
-    if (data.typeId) {
-      await this.typeService.findById(data.typeId);
+    if (data.teacherId) {
+      await this.teacherService.findById(data.teacherId);
     }
 
     if (data.phoneNumber) {
@@ -218,7 +256,7 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
 
   async findByEmail(
     email: string,
-    attributes: (keyof TeacherDto)[] = ['id', 'email'],
+    attributes: (keyof ClientDto)[] = ['id', 'email'],
   ) {
     return await this.model
       .findOne({
@@ -226,9 +264,11 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
         attributes: attributes,
         include: [
           {
-            model: TypeModel,
+            model: TeacherModel,
             attributes: {
               exclude: [
+                'hashedPassword',
+                'typeId',
                 'createdAt',
                 'createdBy',
                 'updatedAt',
@@ -236,6 +276,20 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
                 'deletedBy',
               ],
             },
+            include: [
+              {
+                model: TypeModel,
+                attributes: {
+                  exclude: [
+                    'createdAt',
+                    'createdBy',
+                    'updatedAt',
+                    'deletedAt',
+                    'deletedBy',
+                  ],
+                },
+              },
+            ],
           },
         ],
       })
@@ -244,7 +298,7 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
 
   async findByPhoneNumber(
     phoneNumber: string,
-    attributes: (keyof TeacherDto)[] = ['id', 'phoneNumber'],
+    attributes: (keyof ClientDto)[] = ['id', 'phoneNumber'],
   ) {
     return await this.model
       .findOne({
@@ -252,9 +306,11 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
         attributes: attributes,
         include: [
           {
-            model: TypeModel,
+            model: TeacherModel,
             attributes: {
               exclude: [
+                'hashedPassword',
+                'typeId',
                 'createdAt',
                 'createdBy',
                 'updatedAt',
@@ -262,6 +318,20 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
                 'deletedBy',
               ],
             },
+            include: [
+              {
+                model: TypeModel,
+                attributes: {
+                  exclude: [
+                    'createdAt',
+                    'createdBy',
+                    'updatedAt',
+                    'deletedAt',
+                    'deletedBy',
+                  ],
+                },
+              },
+            ],
           },
         ],
       })
