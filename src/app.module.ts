@@ -4,10 +4,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ENV } from './common/config/config';
 import { TypeModule } from './modules/type/type.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
+import { TypeModel } from './modules/type/type.model';
+import { TeacherModel } from './modules/teacher/teacher.model';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: ENV.DB.POSTGRES.HOST,
@@ -15,15 +20,17 @@ import { TeacherModule } from './modules/teacher/teacher.module';
       username: ENV.DB.POSTGRES.USER,
       password: ENV.DB.POSTGRES.PASSWORD,
       database: ENV.DB.POSTGRES.DATABASE,
-      synchronize: true, // !!do not use in prod
       autoLoadModels: true,
+      logging: false,
       pool: { min: 10, max: 30 },
+      ssl: true,
       dialectOptions: {
         ssl: {
           require: true,
           rejectUnauthorized: false,
         },
       },
+      models: [TypeModel, TeacherModel],
     }),
     TypeModule,
     TeacherModule,

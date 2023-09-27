@@ -14,15 +14,15 @@ const getOrReturnDefaultNumber = (value: unknown, def: number): number =>
 
 export const ENV: ImportMetaEnv = {
   ENVIRONMENT: (process.env.ENVIRONMENT || 'development') as ServiceEnvType,
-  HTTP_HOST: process.env.HTTP_HOST || '0.0.0.0',
-  HTTP_PORT: getOrReturnDefaultNumber(process.env.HTTP_PORT, 4000),
+  HTTP_HOST: process.env.HOST || '0.0.0.0',
+  HTTP_PORT: getOrReturnDefaultNumber(process.env.PORT, 4000),
   DB: {
     POSTGRES: {
-      USER: process.env.POSTGRES_USER || 'postgres',
-      HOST: process.env.POSTGRES_HOST || 'localhost',
-      DATABASE: process.env.POSTGRES_DATABASE || 'mono_pos',
-      PASSWORD: process.env.POSTGRES_PASSWORD,
-      PORT: getOrReturnDefaultNumber(process.env.POSTGRES_PORT, 5432),
+      USER: process.env.PG_USER || 'postgres',
+      HOST: process.env.PG_HOST || 'localhost',
+      DATABASE: process.env.PG_DB || 'mono_pos',
+      PASSWORD: process.env.PG_PASSWORD,
+      PORT: getOrReturnDefaultNumber(process.env.PG_PORT, 5432),
       UUID_VERSION: (process.env.POSTGRES_UUID_VERSION as UUIDVersion) || 4,
     },
     REDIS: {
