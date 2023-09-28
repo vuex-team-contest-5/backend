@@ -25,10 +25,10 @@ import { ProductModule } from './modules/product/product.module';
       logging: false,
       pool: { min: 10, max: 30 },
       dialectOptions: {
-        // ssl: {
-        //   require: true,
-        //   rejectUnauthorized: false,
-        // },
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
       },
     }),
     TypeModule,
