@@ -33,7 +33,7 @@ export class BaseDto {
     type: 'boolean',
     example: true,
   })
-  @IsOptional({ groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE] })
+  @IsOptional({ groups: [BaseDtoGroup.UPDATE] })
   @Transform(({ value }) => Boolean(value))
   @IsBoolean({
     groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE],

@@ -103,6 +103,7 @@ export class AdminController {
   @ApiBody({
     schema: {
       type: 'object',
+      required: ['id'],
       properties: {
         id: {
           type: 'string',

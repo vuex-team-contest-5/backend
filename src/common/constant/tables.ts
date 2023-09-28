@@ -9,5 +9,5 @@ export const PG_TABLE_NAMES = {
   ADMIN: 'admin',
   CHAT: 'chat',
   MESSAGE: 'message',
-  FILE_MESSAGE: 'file_message',
+  FILE: 'file',
 };

@@ -14,20 +14,24 @@ import { AdminModel } from '../admin/admin.model';
 import { TypeModel } from '../type/type.model';
 import { ChatService } from './../chat/chat.service';
 import { ChatModel } from '../chat/chat.model';
+import { FileModel } from './file/file.model';
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class MessageService extends BaseService<MessageDto, MessageDto> {
   constructor(
     @InjectModel(MessageModel) readonly model: typeof MessageModel,
+    @InjectModel(FileModel) readonly fileModel: typeof FileModel,
     private readonly adminService: AdminService,
     private readonly clientService: ClientService,
     private readonly chatService: ChatService,
+    private readonly imageService: ImageService,
     private readonly sequelize: Sequelize,
   ) {
     super(model);
   }
 
-  async create(data: MessageDto) {
+  async create(data: MessageDto, images?: Express.Multer.File[]) {
     const chat = await this.chatService.findById(data.chatId);
 
     if (chat.adminId !== data.ownerId && chat.clientId !== data.ownerId) {
@@ -37,7 +41,33 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
     data.id = randomUUID();
     data.isClient = chat.clientId === data.ownerId;
 
-    await this.model.create(data);
+    if (images) {
+      const fileNames = [];
+      for (let image of images) {
+        const fileName = await this.imageService.create(image);
+        fileNames.push(fileName);
+      }
+
+      const tr = await this.sequelize.transaction();
+
+      try {
+        await this.model.create(data, { transaction: tr });
+
+        await this.fileModel.bulkCreate(
+          fileNames.map((fileName) => ({
+            id: randomUUID(),
+            fileName,
+            messageId: data.id,
+          })),
+          { transaction: tr },
+        );
+
+        await tr.commit();
+      } catch (error) {
+        await tr.rollback();
+        throw CommonException.UnknownError(error, 400);
+      }
+    }
 
     const instance = await this.model.findOne({
       where: { id: data.id },
@@ -45,6 +75,19 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
         exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
       include: [
+        {
+          model: FileModel,
+          attributes: {
+            exclude: [
+              'messageId',
+              'createdAt',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+        },
         {
           model: ChatModel,
           attributes: {
@@ -141,6 +184,21 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
       attributes: {
         exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
+      include: [
+        {
+          model: FileModel,
+          attributes: {
+            exclude: [
+              'messageId',
+              'createdAt',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+        },
+      ],
     });
 
     return {
@@ -154,13 +212,26 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
     };
   }
 
-  async updateById(data: MessageDto) {
+  async updateById(data: MessageDto, images?: Express.Multer.File[]) {
     const instance = await this.model.findOne({
       where: { id: data.id },
       attributes: {
         exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
       include: [
+        {
+          model: FileModel,
+          attributes: {
+            exclude: [
+              'messageId',
+              'createdAt',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+        },
         {
           model: ChatModel,
           attributes: {
@@ -245,6 +316,52 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
       await this.chatService.findById(data.chatId);
     }
 
-    return (await instance.update(data)).toJSON();
+    if (!images) {
+      return (await instance.update(data)).toJSON();
+    }
+
+    const tr = await this.sequelize.transaction();
+
+    try {
+      const files = await this.fileModel.findAll({
+        where: { messageId: data.id },
+      });
+
+      await this.fileModel.destroy({
+        where: { messageId: data.id },
+        force: true,
+        transaction: tr,
+      });
+
+      for (let file of files) {
+        try {
+          await this.imageService.remove(file.toJSON().fileName);
+        } catch (error) {}
+      }
+
+      const fileNames = [];
+      for (let image of images) {
+        const fileName = await this.imageService.create(image);
+        fileNames.push(fileName);
+      }
+
+      await this.fileModel.bulkCreate(
+        fileNames.map((fileName) => ({
+          id: randomUUID(),
+          fileName,
+          messageId: data.id,
+        })),
+        { transaction: tr },
+      );
+
+      await instance.update(data, { transaction: tr });
+
+      await tr.commit();
+
+      return (await instance.reload()).toJSON();
+    } catch (error) {
+      await tr.rollback();
+      throw CommonException.UnknownError(error, 400);
+    }
   }
 }

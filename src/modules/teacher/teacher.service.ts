@@ -216,7 +216,7 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
       data.imageName = fileName;
     }
 
-    return (await instance.update(data)).toJSON();
+    return (await (await instance.update(data)).reload()).toJSON();
   }
 
   async findByEmail(

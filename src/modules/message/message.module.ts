@@ -6,13 +6,16 @@ import { MessageModel } from './message.model';
 import { AdminModule } from '../admin/admin.module';
 import { ClientModule } from '../client/client.module';
 import { ChatModule } from '../chat/chat.module';
+import { FileModel } from './file/file.model';
+import { ImageModule } from '../image/image.module';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([MessageModel]),
+    SequelizeModule.forFeature([MessageModel, FileModel]),
     AdminModule,
     ClientModule,
     ChatModule,
+    ImageModule,
   ],
   controllers: [MessageController],
   providers: [MessageService],

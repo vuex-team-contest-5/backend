@@ -11,6 +11,8 @@ import { MessageDto } from './message.dto';
 import { DataTypes } from 'sequelize';
 import { ChatModel } from '../chat/chat.model';
 import { ChatDto } from '../chat/chat.dto';
+import { FileModel } from './file/file.model';
+import { FileDto } from './file/file.dto';
 
 @Table({ tableName: PG_TABLE_NAMES.MESSAGE, underscored: true })
 export class MessageModel extends PGBaseModel<MessageDto, MessageDto> {
@@ -30,6 +32,6 @@ export class MessageModel extends PGBaseModel<MessageDto, MessageDto> {
   @BelongsTo(() => ChatModel)
   chat?: ChatDto;
 
-  // @HasMany(() => FileMessageModel)
-  // fileMessage: FileMessageDto[];
+  @HasMany(() => FileModel)
+  file: FileDto[];
 }

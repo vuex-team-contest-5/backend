@@ -7,12 +7,22 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { MessageDto, MessageDtoGroup, MessagePagingDto } from './message.dto';
 import { Auth } from '../../auth/auth.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ImagesValidationPipe } from '../../common/validators/images-validation.pipe';
 
 @Controller('message')
 @ApiTags('Message')
@@ -20,13 +30,52 @@ import { Auth } from '../../auth/auth.decorator';
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['body', 'status', 'ownerId', 'chatId'],
+      properties: {
+        images: {
+          type: 'array',
+          maxItems: 5,
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'The images of the message.',
+        },
+        body: {
+          type: 'string',
+          example: 'Some text',
+          description: 'The body of the message.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the message.',
+        },
+        ownerId: {
+          type: 'string',
+          example: '12345678',
+          description: 'The ID of the owner to which this message belongs.',
+        },
+        chatId: {
+          type: 'string',
+          example: '12345678',
+          description: 'The ID of the chat to which this message belongs.',
+        },
+      },
+    },
+  })
   @Post()
   // @Auth()
+  @UseInterceptors(FilesInterceptor('images', 5))
   async create(
-    @Body(new MyValidationPipe([MessageDtoGroup.CREATE]))
-    data: MessageDto,
+    @Body(new MyValidationPipe([MessageDtoGroup.CREATE])) data: MessageDto,
+    @UploadedFiles(new ImagesValidationPipe()) images: Express.Multer.File[],
   ) {
-    return this.messageService.create(data);
+    return this.messageService.create(data, images);
   }
 
   @ApiQuery({
@@ -49,13 +98,57 @@ export class MessageController {
     return this.messageService.findById(id);
   }
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: {
+          type: 'string',
+          example: '13245678',
+          description: 'The ID of the message.',
+        },
+        images: {
+          type: 'array',
+          maxItems: 5,
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'The images of the message.',
+        },
+        body: {
+          type: 'string',
+          example: 'Some text',
+          description: 'The body of the message.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the message.',
+        },
+        ownerId: {
+          type: 'string',
+          example: '12345678',
+          description: 'The ID of the owner to which this message belongs.',
+        },
+        chatId: {
+          type: 'string',
+          example: '12345678',
+          description: 'The ID of the chat to which this message belongs.',
+        },
+      },
+    },
+  })
   @Patch()
   // @Auth()
+  @UseInterceptors(FilesInterceptor('images', 5))
   async update(
-    @Body(new MyValidationPipe([MessageDtoGroup.UPDATE]))
-    data: MessageDto,
+    @Body(new MyValidationPipe([MessageDtoGroup.UPDATE])) data: MessageDto,
+    @UploadedFiles(new ImagesValidationPipe()) images: Express.Multer.File[],
   ) {
-    return this.messageService.updateById(data);
+    return this.messageService.updateById(data, images);
   }
 
   @Delete(':id')

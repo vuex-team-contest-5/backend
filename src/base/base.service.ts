@@ -64,7 +64,7 @@ export abstract class BaseService<
       throw CommonException.NotFound(this.model.tableName);
     }
 
-    return (await instance.update(data)).toJSON();
+    return (await (await instance.update(data)).reload()).toJSON();
   }
 
   async deleteById(id: any) {

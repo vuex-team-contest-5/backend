@@ -57,6 +57,10 @@ export class ImageService {
     const bucket = await this.getBucket();
 
     const file = bucket.file(fileName);
+
+    console.log(fileName, '..............................................');
+    
+
     const exists = await file.exists();
     if (exists[0]) {
       await file.delete();

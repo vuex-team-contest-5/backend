@@ -165,6 +165,6 @@ export class ProductService extends BaseService<ProductDto, ProductDto> {
       data.imageName = fileName;
     }
 
-    return (await instance.update(data)).toJSON();
+    return (await (await instance.update(data)).reload()).toJSON();
   }
 }

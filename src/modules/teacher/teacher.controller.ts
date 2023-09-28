@@ -103,7 +103,7 @@ export class TeacherController {
           description: 'The status of the teacher.',
         },
         typeId: {
-          type: 'number',
+          type: 'string',
           example: '12345678',
           description: 'The ID of the type to which this teacher belongs.',
         },
@@ -145,6 +145,7 @@ export class TeacherController {
   @ApiBody({
     schema: {
       type: 'object',
+      required: ['id'],
       properties: {
         id: {
           type: 'string',
@@ -207,7 +208,7 @@ export class TeacherController {
           description: 'The status of the teacher.',
         },
         typeId: {
-          type: 'number',
+          type: 'string',
           example: '12345678',
           description: 'The ID of the type to which this teacher belongs.',
         },

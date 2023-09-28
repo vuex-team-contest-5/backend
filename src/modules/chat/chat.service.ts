@@ -299,6 +299,6 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
       await this.clientService.findById(data.clientId);
     }
 
-    return (await instance.update(data)).toJSON();
+    return (await (await instance.update(data)).reload()).toJSON();
   }
 }

@@ -104,7 +104,7 @@ export class ClientController {
           description: 'The status of the client.',
         },
         teacherId: {
-          type: 'number',
+          type: 'string',
           example: '12345678',
           description: 'The ID of the teacher to which this client belongs.',
         },
@@ -146,6 +146,7 @@ export class ClientController {
   @ApiBody({
     schema: {
       type: 'object',
+      required: ['id'],
       properties: {
         id: {
           type: 'string',
@@ -208,7 +209,7 @@ export class ClientController {
           description: 'The status of the client.',
         },
         teacherId: {
-          type: 'number',
+          type: 'string',
           example: '12345678',
           description: 'The ID of the teacher to which this client belongs.',
         },

@@ -364,7 +364,7 @@ export class ClientService extends BaseService<ClientDto, ClientDto> {
       data.imageName = fileName;
     }
 
-    return (await instance.update(data)).toJSON();
+    return (await (await instance.update(data)).reload()).toJSON();
   }
 
   async orderProduct(data: OrderDto) {
