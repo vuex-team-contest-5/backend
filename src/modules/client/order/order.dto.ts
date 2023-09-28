@@ -8,11 +8,11 @@ export class OrderDtoGroup extends BaseDtoGroup {}
 export class OrderPagingDto extends PagingDto {
   @IsOptional({ groups: [OrderDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [OrderDtoGroup.PAGINATION] })
-  clientId?: string;
+  productId?: string;
 
   @IsOptional({ groups: [OrderDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [OrderDtoGroup.PAGINATION] })
-  productId?: string;
+  clientId?: string;
 }
 
 export class OrderDto extends BaseDto {

@@ -84,6 +84,9 @@ export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
     query.page = Number(query.page || 1);
 
     const filter = {};
+    if (query.status) {
+      filter['status'] = query.status;
+    }
     if (query.typeId) {
       filter['typeId'] = query.typeId;
     }

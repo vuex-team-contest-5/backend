@@ -22,6 +22,9 @@ export class CategoryService extends BaseService<CategoryDto, CategoryDto> {
     query.page = Number(query.page || 1);
 
     const filter = { type: query.type };
+    if (query.status) {
+      filter['status'] = query.status;
+    }
 
     const instance = await this.model.findAndCountAll({
       order: [['createdAt', String(query.orderType || 'ASC')]],

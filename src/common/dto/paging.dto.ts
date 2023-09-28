@@ -1,5 +1,6 @@
 import { Expose, Transform } from 'class-transformer';
 import {
+  IsBooleanString,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -80,4 +81,9 @@ export class PagingDto<T = any> {
   @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [BaseDtoGroup.PAGINATION] })
   createdBy?: string;
+
+  @ApiProperty({ type: 'boolean', example: null, required: false })
+  @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
+  @IsBooleanString({ groups: [BaseDtoGroup.PAGINATION] })
+  status?: boolean;
 }

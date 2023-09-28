@@ -67,6 +67,9 @@ export class ProductService extends BaseService<ProductDto, ProductDto> {
     query.page = Number(query.page || 1);
 
     const filter = { type: query.type };
+    if (query.status) {
+      filter['status'] = query.status;
+    }
     if (query.categoryId) {
       filter['categoryId'] = query.categoryId;
     }

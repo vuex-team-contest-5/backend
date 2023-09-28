@@ -62,8 +62,14 @@ export class AdminService extends BaseService<AdminDto, AdminDto> {
     query.limit = Number(query.limit || 10);
     query.page = Number(query.page || 1);
 
+    const filter = {};
+    if (query.status) {
+      filter['status'] = query.status;
+    }
+
     const instance = await this.model.findAndCountAll({
       order: [['createdAt', String(query.orderType || 'ASC')]],
+      where: filter,
       limit: query.limit,
       offset: (query.page - 1) * query.limit,
       attributes: {

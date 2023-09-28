@@ -108,6 +108,9 @@ export class ClientService extends BaseService<ClientDto, ClientDto> {
     query.page = Number(query.page || 1);
 
     const filter = {};
+    if (query.status) {
+      filter['status'] = query.status;
+    }
     if (query.teacherId) {
       filter['teacherId'] = query.teacherId;
     }
