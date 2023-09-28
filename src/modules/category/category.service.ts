@@ -4,6 +4,7 @@ import { CategoryDto, CategoryPagingDto } from './category.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { CategoryModel } from './category.model';
 import { Sequelize } from 'sequelize';
+import { ProductModel } from '../product/product.model';
 
 @Injectable()
 @Injectable()
@@ -38,10 +39,10 @@ export class CategoryService extends BaseService<CategoryDto, CategoryDto> {
         ],
       },
       include: [
-        // {
-        //   model: ProductModel,
-        //   attributes: [],
-        // },
+        {
+          model: ProductModel,
+          attributes: [],
+        },
       ],
       paranoid: false,
       subQuery: false,

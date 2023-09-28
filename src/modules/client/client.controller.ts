@@ -43,6 +43,7 @@ export class ClientController {
         'servicePrice',
         'startedAt',
         'period',
+        'status',
         'teacherId',
       ],
       properties: {
@@ -95,6 +96,11 @@ export class ClientController {
           type: 'number',
           example: '3',
           description: 'The period in months of the client.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the client.',
         },
         teacherId: {
           type: 'number',
@@ -194,6 +200,11 @@ export class ClientController {
           type: 'number',
           example: '3',
           description: 'The period in months of the client.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the client.',
         },
         teacherId: {
           type: 'number',

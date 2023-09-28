@@ -6,6 +6,7 @@ import { TypeModule } from './modules/type/type.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { ClientModule } from './modules/client/client.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -24,16 +25,17 @@ import { CategoryModule } from './modules/category/category.module';
       logging: false,
       pool: { min: 10, max: 30 },
       dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false,
-        },
+        // ssl: {
+        //   require: true,
+        //   rejectUnauthorized: false,
+        // },
       },
     }),
     TypeModule,
     TeacherModule,
     ClientModule,
     CategoryModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [],

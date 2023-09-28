@@ -43,6 +43,7 @@ export class TeacherController {
         'workDay',
         'info',
         'isMale',
+        'status',
         'typeId',
       ],
       properties: {
@@ -95,6 +96,11 @@ export class TeacherController {
           type: 'boolean',
           example: true,
           description: 'The gender of the teacher.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the teacher.',
         },
         typeId: {
           type: 'number',
@@ -194,6 +200,11 @@ export class TeacherController {
           type: 'boolean',
           example: true,
           description: 'The gender of the teacher.',
+        },
+        status: {
+          type: 'boolean',
+          example: 'true',
+          description: 'The status of the teacher.',
         },
         typeId: {
           type: 'number',

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 
 export class BaseDtoGroup {
@@ -33,6 +34,7 @@ export class BaseDto {
     example: true,
   })
   @IsOptional({ groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE] })
+  @Transform(({ value }) => Boolean(value))
   @IsBoolean({
     groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE],
   })
