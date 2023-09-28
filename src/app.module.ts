@@ -5,6 +5,7 @@ import { ENV } from './common/config/config';
 import { TypeModule } from './modules/type/type.module';
 import { TeacherModule } from './modules/teacher/teacher.module';
 import { ClientModule } from './modules/client/client.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ClientModule } from './modules/client/client.module';
     TypeModule,
     TeacherModule,
     ClientModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
