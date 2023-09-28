@@ -22,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { ClientDto, ClientDtoGroup, ClientPagingDto } from './client.dto';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
+import { OrderDto } from './order/order.dto';
 
 @Controller('client')
 @ApiTags('Client')
@@ -228,5 +229,19 @@ export class ClientController {
   // @Auth()
   async remove(@Param('id') id: string) {
     return this.clientService.deleteById(id);
+  }
+
+  @Post('order')
+  // @Auth()
+  async orderProduct(
+    @Body(new MyValidationPipe([ClientDtoGroup.CREATE])) data: OrderDto,
+  ) {
+    return this.clientService.orderProduct(data);
+  }
+
+  @Delete('order/:id')
+  // @Auth()
+  async removeOrder(@Param('id') id: string) {
+    return this.clientService.removeOrder(id);
   }
 }

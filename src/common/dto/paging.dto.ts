@@ -80,12 +80,4 @@ export class PagingDto<T = any> {
   @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [BaseDtoGroup.PAGINATION] })
   createdBy?: string;
-
-  @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
-  @IsUUID('4', { groups: [BaseDtoGroup.PAGINATION] })
-  organizationId?: string;
-
-  @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
-  @IsUUID('4', { groups: [BaseDtoGroup.PAGINATION] })
-  productId?: string;
 }

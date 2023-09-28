@@ -9,7 +9,9 @@ import { ProductModel } from '../product/product.model';
 @Injectable()
 @Injectable()
 export class CategoryService extends BaseService<CategoryDto, CategoryDto> {
-  constructor(@InjectModel(CategoryModel) model: typeof CategoryModel) {
+  constructor(
+    @InjectModel(CategoryModel) readonly model: typeof CategoryModel,
+  ) {
     super(model);
   }
 

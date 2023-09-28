@@ -11,6 +11,8 @@ import { ProductDto } from './product.dto';
 import { DataTypes } from 'sequelize';
 import { CategoryModel } from '../category/category.model';
 import { CategoryDto } from '../category/category.dto';
+import { OrderModel } from '../client/order/order.model';
+import { OrderDto } from '../client/order/order.dto';
 
 @Table({ tableName: PG_TABLE_NAMES.PRODUCT, underscored: true })
 export class ProductModel extends PGBaseModel<ProductDto, ProductDto> {
@@ -42,6 +44,6 @@ export class ProductModel extends PGBaseModel<ProductDto, ProductDto> {
   @BelongsTo(() => CategoryModel)
   category?: CategoryDto;
 
-  // @HasMany(() => OrderModel)
-  // order: OrderDto[];
+  @HasMany(() => OrderModel)
+  order: OrderDto[];
 }

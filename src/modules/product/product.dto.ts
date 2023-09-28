@@ -35,7 +35,7 @@ export class ProductDto extends BaseDto {
   @IsString({
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  name: string;
+  name?: string;
 
   @ApiProperty({
     description: 'The price of the product.',
@@ -46,7 +46,7 @@ export class ProductDto extends BaseDto {
   @IsString({
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  price: string;
+  price?: string;
 
   @ApiProperty({
     description: 'The brand of the product.',
@@ -57,7 +57,7 @@ export class ProductDto extends BaseDto {
   @IsString({
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  brand: string;
+  brand?: string;
 
   @ApiProperty({
     description: 'The info of the product.',
@@ -68,7 +68,7 @@ export class ProductDto extends BaseDto {
   @IsString({
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  info: string;
+  info?: string;
 
   @ApiProperty({
     description: 'The count of the product.',
@@ -80,7 +80,7 @@ export class ProductDto extends BaseDto {
     { no_symbols: true },
     { groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE] },
   )
-  count: number;
+  count?: number;
 
   @ApiProperty({
     description: 'The type of the product.',
@@ -91,7 +91,7 @@ export class ProductDto extends BaseDto {
   @IsEnum(TypeEnum, {
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  type: string;
+  type?: string;
 
   @ApiProperty({
     description: 'The ID of the category to which this product belongs.',
@@ -102,7 +102,7 @@ export class ProductDto extends BaseDto {
   @IsUUID('4', {
     groups: [ProductDtoGroup.CREATE, ProductDtoGroup.UPDATE],
   })
-  categoryId: string;
+  categoryId?: string;
 
-  imageName: string;
+  imageName?: string;
 }

@@ -13,10 +13,10 @@ import { CategoryModel } from '../category/category.model';
 @Injectable()
 export class ProductService extends BaseService<ProductDto, ProductDto> {
   constructor(
-    @InjectModel(ProductModel) model: typeof ProductModel,
-    private categoryService: CategoryService,
+    @InjectModel(ProductModel) readonly model: typeof ProductModel,
+    private readonly categoryService: CategoryService,
     private readonly imageService: ImageService,
-    private sequelize: Sequelize,
+    private readonly sequelize: Sequelize,
   ) {
     super(model);
   }

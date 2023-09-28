@@ -11,6 +11,8 @@ import { ClientDto } from './client.dto';
 import { DataTypes } from 'sequelize';
 import { TeacherModel } from '../teacher/teacher.model';
 import { TeacherDto } from '../teacher/teacher.dto';
+import { OrderModel } from './order/order.model';
+import { OrderDto } from './order/order.dto';
 
 @Table({ tableName: PG_TABLE_NAMES.CLIENT, underscored: true })
 export class ClientModel extends PGBaseModel<ClientDto, ClientDto> {
@@ -54,6 +56,6 @@ export class ClientModel extends PGBaseModel<ClientDto, ClientDto> {
   // @HasMany(() => ChatModel)
   // chat: ChatDto[];
 
-  // @HasMany(() => OrderModel)
-  // order: OrderDto[];
+  @HasMany(() => OrderModel)
+  order: OrderDto[];
 }

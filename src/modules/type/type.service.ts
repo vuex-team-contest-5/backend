@@ -8,7 +8,7 @@ import { TeacherModel } from '../teacher/teacher.model';
 
 @Injectable()
 export class TypeService extends BaseService<TypeDto, TypeDto> {
-  constructor(@InjectModel(TypeModel) model: typeof TypeModel) {
+  constructor(@InjectModel(TypeModel) readonly model: typeof TypeModel) {
     super(model);
   }
 

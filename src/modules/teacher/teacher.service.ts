@@ -15,10 +15,10 @@ import { ClientModel } from '../client/client.model';
 @Injectable()
 export class TeacherService extends BaseService<TeacherDto, TeacherDto> {
   constructor(
-    @InjectModel(TeacherModel) model: typeof TeacherModel,
-    private typeService: TypeService,
+    @InjectModel(TeacherModel) readonly model: typeof TeacherModel,
+    private readonly typeService: TypeService,
     private readonly imageService: ImageService,
-    private sequelize: Sequelize,
+    private readonly sequelize: Sequelize,
   ) {
     super(model);
   }

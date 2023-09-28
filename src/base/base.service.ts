@@ -70,15 +70,7 @@ export abstract class BaseService<
   async deleteById(id: any) {
     const instance = await this.model.findOne({
       where: { id },
-      attributes: {
-        exclude: [
-          'createdAt',
-          'createdBy',
-          'updatedAt',
-          'deletedAt',
-          'deletedBy',
-        ],
-      },
+      attributes: ['id'],
     });
 
     if (!instance) {

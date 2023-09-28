@@ -38,7 +38,7 @@ export class BaseDto {
   @IsBoolean({
     groups: [BaseDtoGroup.CREATE, BaseDtoGroup.UPDATE],
   })
-  status: boolean;
+  status?: boolean;
 
   @IsOptional({ groups: [BaseDtoGroup.CREATE] })
   @IsUUID('4', { groups: [BaseDtoGroup.CREATE] })
