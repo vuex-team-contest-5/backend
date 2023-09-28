@@ -7,6 +7,8 @@ import { TeacherModule } from './modules/teacher/teacher.module';
 import { ClientModule } from './modules/client/client.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { ImageModule } from './modules/image/image.module';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { ProductModule } from './modules/product/product.module';
         },
       },
     }),
+    AdminModule,
     TypeModule,
     TeacherModule,
     ClientModule,
