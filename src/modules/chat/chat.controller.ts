@@ -30,13 +30,12 @@ export class ChatController {
   }
 
   @ApiQuery({
-    name: 'type',
+    name: 'adminId',
     type: 'string',
-    example: null,
-    required: false,
+    example: '12345678',
   })
   @ApiQuery({
-    name: 'type',
+    name: 'clientId',
     type: 'string',
     example: null,
     required: false,

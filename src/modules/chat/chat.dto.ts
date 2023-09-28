@@ -6,9 +6,8 @@ import { PagingDto } from '../../common/dto/paging.dto';
 export class ChatDtoGroup extends BaseDtoGroup {}
 
 export class ChatPagingDto extends PagingDto {
-  @IsOptional({ groups: [ChatDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [ChatDtoGroup.PAGINATION] })
-  adminId?: string;
+  adminId: string;
 
   @IsOptional({ groups: [ChatDtoGroup.PAGINATION] })
   @IsUUID('4', { groups: [ChatDtoGroup.PAGINATION] })

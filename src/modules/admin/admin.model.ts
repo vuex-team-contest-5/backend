@@ -1,7 +1,9 @@
-import { Table, Column } from 'sequelize-typescript';
+import { Table, Column, HasMany } from 'sequelize-typescript';
 import { PGBaseModel } from '../../base/base.model';
 import { PG_TABLE_NAMES } from '../../common/constant/tables';
 import { AdminDto } from './admin.dto';
+import { ChatModel } from '../chat/chat.model';
+import { ChatDto } from '../chat/chat.dto';
 
 @Table({ tableName: PG_TABLE_NAMES.ADMIN, underscored: true })
 export class AdminModel extends PGBaseModel<AdminDto, AdminDto> {
@@ -23,6 +25,6 @@ export class AdminModel extends PGBaseModel<AdminDto, AdminDto> {
   @Column
   imageName: string;
 
-  // @HasMany(() => ChatModel)
-  // chat: ChatDto[];
+  @HasMany(() => ChatModel)
+  chat: ChatDto[];
 }

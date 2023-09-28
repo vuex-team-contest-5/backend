@@ -13,6 +13,8 @@ import { TeacherModel } from '../teacher/teacher.model';
 import { TeacherDto } from '../teacher/teacher.dto';
 import { OrderModel } from './order/order.model';
 import { OrderDto } from './order/order.dto';
+import { ChatModel } from '../chat/chat.model';
+import { ChatDto } from '../chat/chat.dto';
 
 @Table({ tableName: PG_TABLE_NAMES.CLIENT, underscored: true })
 export class ClientModel extends PGBaseModel<ClientDto, ClientDto> {
@@ -53,8 +55,8 @@ export class ClientModel extends PGBaseModel<ClientDto, ClientDto> {
   @BelongsTo(() => TeacherModel)
   teacher?: TeacherDto;
 
-  // @HasMany(() => ChatModel)
-  // chat: ChatDto[];
+  @HasMany(() => ChatModel)
+  chat: ChatDto[];
 
   @HasMany(() => OrderModel)
   order: OrderDto[];

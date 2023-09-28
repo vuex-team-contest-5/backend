@@ -10,6 +10,7 @@ import { ProductModule } from './modules/product/product.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ChatModule } from './modules/chat/chat.module';
     CategoryModule,
     ProductModule,
     ChatModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [],

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../base/base.service';
-import { ChatDto, ChatPagingDto } from './chat.dto';
+import { MessageDto, MessagePagingDto } from './message.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { ChatModel } from './chat.model';
+import { MessageModel } from './message.model';
 import { randomUUID } from 'crypto';
 import { CommonException } from '../../common/errors/common.error';
 import { Sequelize } from 'sequelize-typescript';
@@ -12,59 +12,45 @@ import { ClientModel } from '../client/client.model';
 import { TeacherModel } from '../teacher/teacher.model';
 import { AdminModel } from '../admin/admin.model';
 import { TypeModel } from '../type/type.model';
+import { ChatService } from './../chat/chat.service';
+import { ChatModel } from '../chat/chat.model';
 
 @Injectable()
-export class ChatService extends BaseService<ChatDto, ChatDto> {
+export class MessageService extends BaseService<MessageDto, MessageDto> {
   constructor(
-    @InjectModel(ChatModel) readonly model: typeof ChatModel,
+    @InjectModel(MessageModel) readonly model: typeof MessageModel,
     private readonly adminService: AdminService,
     private readonly clientService: ClientService,
+    private readonly chatService: ChatService,
     private readonly sequelize: Sequelize,
   ) {
     super(model);
   }
 
-  async create(data: ChatDto) {
-    await this.adminService.findById(data.adminId);
-    await this.clientService.findById(data.clientId);
+  async create(data: MessageDto) {
+    const chat = await this.chatService.findById(data.chatId);
+
+    if (chat.adminId !== data.ownerId && chat.clientId !== data.ownerId) {
+      throw CommonException.NotFound('Owner');
+    }
 
     data.id = randomUUID();
+    data.isClient = chat.clientId === data.ownerId;
 
     await this.model.create(data);
 
     const instance = await this.model.findOne({
       where: { id: data.id },
       attributes: {
-        exclude: [
-          'adminId',
-          'clientId',
-          'createdAt',
-          'createdBy',
-          'updatedAt',
-          'deletedAt',
-          'deletedBy',
-        ],
+        exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
       include: [
         {
-          model: AdminModel,
+          model: ChatModel,
           attributes: {
             exclude: [
-              'hashedPassword',
-              'createdAt',
-              'createdBy',
-              'updatedAt',
-              'deletedAt',
-              'deletedBy',
-            ],
-          },
-        },
-        {
-          model: ClientModel,
-          attributes: {
-            exclude: [
-              'hashedPassword',
-              'teacherId',
+              'adminId',
+              'clientId',
               'createdAt',
               'createdBy',
               'updatedAt',
@@ -74,11 +60,24 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
           },
           include: [
             {
-              model: TeacherModel,
+              model: AdminModel,
               attributes: {
                 exclude: [
                   'hashedPassword',
-                  'typeId',
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+            {
+              model: ClientModel,
+              attributes: {
+                exclude: [
+                  'hashedPassword',
+                  'teacherId',
                   'createdAt',
                   'createdBy',
                   'updatedAt',
@@ -88,9 +87,11 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
               },
               include: [
                 {
-                  model: TypeModel,
+                  model: TeacherModel,
                   attributes: {
                     exclude: [
+                      'hashedPassword',
+                      'typeId',
                       'createdAt',
                       'createdBy',
                       'updatedAt',
@@ -98,6 +99,20 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
                       'deletedBy',
                     ],
                   },
+                  include: [
+                    {
+                      model: TypeModel,
+                      attributes: {
+                        exclude: [
+                          'createdAt',
+                          'createdBy',
+                          'updatedAt',
+                          'deletedAt',
+                          'deletedBy',
+                        ],
+                      },
+                    },
+                  ],
                 },
               ],
             },
@@ -109,19 +124,13 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     return instance.toJSON();
   }
 
-  async findAll(query: ChatPagingDto): Promise<ResponsePaging<ChatDto>> {
+  async findAll(query: MessagePagingDto): Promise<ResponsePaging<MessageDto>> {
     query.limit = Number(query.limit || 10);
     query.page = Number(query.page || 1);
 
-    const filter = { adminId: query.adminId };
+    const filter = { chatId: query.chatId };
     if (query.status) {
       filter['status'] = query.status;
-    }
-    if (query.adminId) {
-      filter['adminId'] = query.adminId;
-    }
-    if (query.clientId) {
-      filter['clientId'] = query.clientId;
     }
 
     const instance = await this.model.findAndCountAll({
@@ -130,75 +139,8 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
       limit: query.limit,
       offset: (query.page - 1) * query.limit,
       attributes: {
-        exclude: [
-          'adminId',
-          'clientId',
-          'createdAt',
-          'createdBy',
-          'updatedAt',
-          'deletedAt',
-          'deletedBy',
-        ],
+        exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
-      include: [
-        {
-          model: AdminModel,
-          attributes: {
-            exclude: [
-              'hashedPassword',
-              'createdAt',
-              'createdBy',
-              'updatedAt',
-              'deletedAt',
-              'deletedBy',
-            ],
-          },
-        },
-        {
-          model: ClientModel,
-          attributes: {
-            exclude: [
-              'hashedPassword',
-              'teacherId',
-              'createdAt',
-              'createdBy',
-              'updatedAt',
-              'deletedAt',
-              'deletedBy',
-            ],
-          },
-          include: [
-            {
-              model: TeacherModel,
-              attributes: {
-                exclude: [
-                  'hashedPassword',
-                  'typeId',
-                  'createdAt',
-                  'createdBy',
-                  'updatedAt',
-                  'deletedAt',
-                  'deletedBy',
-                ],
-              },
-              include: [
-                {
-                  model: TypeModel,
-                  attributes: {
-                    exclude: [
-                      'createdAt',
-                      'createdBy',
-                      'updatedAt',
-                      'deletedAt',
-                      'deletedBy',
-                    ],
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ],
     });
 
     return {
@@ -212,40 +154,19 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     };
   }
 
-  async updateById(data: ChatDto) {
+  async updateById(data: MessageDto) {
     const instance = await this.model.findOne({
       where: { id: data.id },
       attributes: {
-        exclude: [
-          'adminId',
-          'clientId',
-          'createdAt',
-          'createdBy',
-          'updatedAt',
-          'deletedAt',
-          'deletedBy',
-        ],
+        exclude: ['chatId', 'createdBy', 'updatedAt', 'deletedAt', 'deletedBy'],
       },
       include: [
         {
-          model: AdminModel,
+          model: ChatModel,
           attributes: {
             exclude: [
-              'hashedPassword',
-              'createdAt',
-              'createdBy',
-              'updatedAt',
-              'deletedAt',
-              'deletedBy',
-            ],
-          },
-        },
-        {
-          model: ClientModel,
-          attributes: {
-            exclude: [
-              'hashedPassword',
-              'teacherId',
+              'adminId',
+              'clientId',
               'createdAt',
               'createdBy',
               'updatedAt',
@@ -255,11 +176,24 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
           },
           include: [
             {
-              model: TeacherModel,
+              model: AdminModel,
               attributes: {
                 exclude: [
                   'hashedPassword',
-                  'typeId',
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+            {
+              model: ClientModel,
+              attributes: {
+                exclude: [
+                  'hashedPassword',
+                  'teacherId',
                   'createdAt',
                   'createdBy',
                   'updatedAt',
@@ -269,9 +203,11 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
               },
               include: [
                 {
-                  model: TypeModel,
+                  model: TeacherModel,
                   attributes: {
                     exclude: [
+                      'hashedPassword',
+                      'typeId',
                       'createdAt',
                       'createdBy',
                       'updatedAt',
@@ -279,6 +215,20 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
                       'deletedBy',
                     ],
                   },
+                  include: [
+                    {
+                      model: TypeModel,
+                      attributes: {
+                        exclude: [
+                          'createdAt',
+                          'createdBy',
+                          'updatedAt',
+                          'deletedAt',
+                          'deletedBy',
+                        ],
+                      },
+                    },
+                  ],
                 },
               ],
             },
@@ -291,12 +241,8 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
       throw CommonException.NotFound(this.model.tableName);
     }
 
-    if (data.adminId) {
-      await this.adminService.findById(data.adminId);
-    }
-
-    if (data.clientId) {
-      await this.clientService.findById(data.clientId);
+    if (data.chatId) {
+      await this.chatService.findById(data.chatId);
     }
 
     return (await instance.update(data)).toJSON();
