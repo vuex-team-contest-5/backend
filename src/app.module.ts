@@ -11,6 +11,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MessageModule } from './modules/message/message.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -29,12 +30,13 @@ import { MessageModule } from './modules/message/message.module';
       logging: false,
       pool: { min: 10, max: 30 },
       dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false,
-        },
+        // ssl: {
+        //   require: true,
+        //   rejectUnauthorized: false,
+        // },
       },
     }),
+    AuthModule,
     AdminModule,
     TypeModule,
     TeacherModule,

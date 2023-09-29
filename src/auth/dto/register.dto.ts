@@ -1,14 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseDto, BaseDtoGroup } from '../../base/base.dto';
-import {
-  IsString,
-  IsUUID,
-  Matches,
-  MinLength,
-  Validate,
-} from 'class-validator';
+import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
 import { regexps } from '../../common/constant/regex';
-import { IsPasswordsMatch } from '../../common/validators/custom/auth-password.validator.dto.';
 
 export class RegisterDtoGroup extends BaseDtoGroup {
   static readonly REGISTER = 'register';
@@ -16,7 +9,7 @@ export class RegisterDtoGroup extends BaseDtoGroup {
 
 export class RegisterDto extends BaseDto {
   @ApiProperty({
-    description: 'The first name of the user.',
+    description: 'The first name of the admin.',
     type: 'string',
     example: 'John',
   })
@@ -26,7 +19,7 @@ export class RegisterDto extends BaseDto {
   firstName: string;
 
   @ApiProperty({
-    description: 'The last name of the user.',
+    description: 'The last name of the admin.',
     type: 'string',
     example: 'Doe',
   })
@@ -36,9 +29,20 @@ export class RegisterDto extends BaseDto {
   lastName: string;
 
   @ApiProperty({
-    description: 'The phone number of the user.',
+    description: 'The email address of the admin.',
     type: 'string',
-    example: '+998991234567',
+    example: 'johndoe@example.com',
+  })
+  @IsEmail(
+    { domain_specific_validation: true },
+    { groups: [RegisterDtoGroup.REGISTER] },
+  )
+  email: string;
+
+  @ApiProperty({
+    description: 'The phone number of the admin.',
+    type: 'string',
+    example: '+998990001100',
   })
   @Matches(regexps.UZ_PHONE_NUMBER, {
     groups: [RegisterDtoGroup.REGISTER],
@@ -47,17 +51,7 @@ export class RegisterDto extends BaseDto {
   phoneNumber: string;
 
   @ApiProperty({
-    description: 'The username of the user.',
-    type: 'string',
-    example: 'johndoe123',
-  })
-  @IsString({
-    groups: [RegisterDtoGroup.REGISTER],
-  })
-  username: string;
-
-  @ApiProperty({
-    description: 'The password of the user.',
+    description: 'The password of the admin.',
     type: 'string',
     example: 'password123',
   })
@@ -65,36 +59,7 @@ export class RegisterDto extends BaseDto {
     groups: [RegisterDtoGroup.REGISTER],
   })
   @MinLength(3, { groups: [RegisterDtoGroup.REGISTER] })
-  @Validate(IsPasswordsMatch, { groups: [RegisterDtoGroup.REGISTER] })
   password: string;
 
-  @ApiProperty({
-    description: 'The confirm password of the user.',
-    type: 'string',
-    example: 'password123',
-  })
-  @IsString({
-    groups: [RegisterDtoGroup.REGISTER],
-  })
-  passwordRetry: string;
-
-  @ApiProperty({
-    description: 'The name of the organization.',
-    type: 'string',
-    example: 'KFC',
-  })
-  @IsString({
-    groups: [RegisterDtoGroup.REGISTER],
-  })
-  organizationName: string;
-
-  @ApiProperty({
-    description: 'The ID of the region to which this store belongs.',
-    type: 'string',
-    example: '12345678',
-  })
-  @IsUUID('4', {
-    groups: [RegisterDtoGroup.REGISTER],
-  })
-  regionId: string;
+  hashedPassword: string;
 }

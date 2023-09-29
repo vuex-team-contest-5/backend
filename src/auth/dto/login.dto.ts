@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsEmail, Matches } from 'class-validator';
 import { BaseDtoGroup } from '../../base/base.dto';
+import { regexps } from '../../common/constant/regex';
 
 export class LoginDtoGroup extends BaseDtoGroup {
   static readonly LOGIN = 'login';
@@ -8,22 +9,24 @@ export class LoginDtoGroup extends BaseDtoGroup {
 
 export class LoginDto {
   @ApiProperty({
-    description: 'The username of the user.',
+    description: 'The email address of the admin.',
     type: 'string',
-    example: 'johndoe123',
+    example: 'johndoe@example.com',
   })
-  @IsString({
-    groups: [LoginDtoGroup.LOGIN],
-  })
-  username: string;
+  @IsEmail(
+    { domain_specific_validation: true },
+    { groups: [LoginDtoGroup.LOGIN] },
+  )
+  email: string;
 
   @ApiProperty({
-    description: 'The password of the user.',
+    description: 'The phone number of the admin.',
     type: 'string',
-    example: 'password123',
+    example: '+998990001100',
   })
-  @IsString({
+  @Matches(regexps.UZ_PHONE_NUMBER, {
     groups: [LoginDtoGroup.LOGIN],
+    message: 'Phone number must be in the format +998XXXXXXXXX',
   })
-  password: string;
+  phoneNumber: string;
 }
