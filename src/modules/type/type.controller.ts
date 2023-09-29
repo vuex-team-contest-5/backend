@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TypeDto, TypeDtoGroup, TypePagingDto } from './type.dto';
 import { MyValidationPipe } from 'src/common/validators/validation.pipe';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
 
 @Controller('type')
 @ApiTags('Type')
@@ -21,8 +22,8 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 export class TypeController {
   constructor(private readonly typeService: TypeService) {}
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(
     @Body(new MyValidationPipe([TypeDtoGroup.CREATE]))
     data: TypeDto,
@@ -30,8 +31,8 @@ export class TypeController {
     return this.typeService.create(data);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([TypeDtoGroup.PAGINATION]))
     query: TypePagingDto,
@@ -39,14 +40,14 @@ export class TypeController {
     return this.typeService.findAll(query);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.typeService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch()
-  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new MyValidationPipe([TypeDtoGroup.UPDATE]))
     data: TypeDto,
@@ -54,8 +55,8 @@ export class TypeController {
     return this.typeService.updateById(data);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.typeService.deleteById(id);
   }
