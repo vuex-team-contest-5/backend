@@ -7,7 +7,11 @@ export const redisClientFactory: FactoryProvider<Promise<RedisClient>> = {
   provide: REDIS_CLIENT,
   useFactory: async () => {
     const client = createClient({
-      url: ENV.DB.REDIS.URL,
+      password: ENV.DB.REDIS.PASSWORD,
+      socket: {
+        host: ENV.DB.REDIS.URL,
+        port: ENV.DB.REDIS.PORT,
+      },
     });
     await client.connect();
     return client;

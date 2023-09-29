@@ -27,6 +27,7 @@ export const ENV: ImportMetaEnv = {
     },
     REDIS: {
       URL: process.env.REDIS_URL || '',
+      PORT: Number(process.env.REDIS_PORT) || 6379,
       PASSWORD: process.env.REDIS_PASSWORD || '',
     },
     MINIO: {

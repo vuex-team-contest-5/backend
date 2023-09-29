@@ -24,6 +24,7 @@ declare global {
       };
       REDIS: {
         URL: string;
+        PORT: number;
         PASSWORD: string;
       };
       MINIO: {
