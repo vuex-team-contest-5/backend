@@ -24,6 +24,7 @@ import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
 
 @Controller('teacher')
 @ApiTags('Teacher')
@@ -112,8 +113,8 @@ export class TeacherController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([TeacherDtoGroup.CREATE])) data: TeacherDto,
@@ -128,8 +129,8 @@ export class TeacherController {
     example: null,
     required: false,
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([TeacherDtoGroup.PAGINATION]))
     query: TeacherPagingDto,
@@ -137,8 +138,8 @@ export class TeacherController {
     return this.teacherService.findAll(query);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.teacherService.findById(id);
   }
@@ -217,8 +218,8 @@ export class TeacherController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Body(new MyValidationPipe([TeacherDtoGroup.UPDATE])) data: TeacherDto,
@@ -227,8 +228,8 @@ export class TeacherController {
     return this.teacherService.updateById(data, image);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.teacherService.deleteById(id);
   }
