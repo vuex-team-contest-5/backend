@@ -24,6 +24,7 @@ import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
 
 @Controller('product')
 @ApiTags('Product')
@@ -95,7 +96,7 @@ export class ProductController {
     },
   })
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([ProductDtoGroup.CREATE])) data: ProductDto,
@@ -190,7 +191,7 @@ export class ProductController {
     },
   })
   @Patch()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Body(new MyValidationPipe([ProductDtoGroup.UPDATE])) data: ProductDto,
@@ -200,7 +201,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async remove(@Param('id') id: string) {
     return this.productService.deleteById(id);
   }
