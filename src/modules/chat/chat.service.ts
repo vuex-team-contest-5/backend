@@ -12,6 +12,9 @@ import { ClientModel } from '../client/client.model';
 import { TeacherModel } from '../teacher/teacher.model';
 import { AdminModel } from '../admin/admin.model';
 import { TypeModel } from '../type/type.model';
+import { ReqUserInterface } from '../../auth/dto/req.dto';
+import { MessageModel } from '../message/message.model';
+import { FileModel } from '../message/file/file.model';
 
 @Injectable()
 export class ChatService extends BaseService<ChatDto, ChatDto> {
@@ -113,7 +116,7 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     query.limit = Number(query.limit || 10);
     query.page = Number(query.page || 1);
 
-    const filter = { adminId: query.adminId };
+    const filter = {};
     if (query.status) {
       filter['status'] = query.status;
     }
@@ -212,6 +215,62 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     };
   }
 
+  async findById(id: any, user?: ReqUserInterface) {
+    const instance = await this.model.findOne({
+      where: { id },
+      attributes: {
+        exclude: [
+          'createdAt',
+          'createdBy',
+          'updatedAt',
+          'deletedAt',
+          'deletedBy',
+        ],
+      },
+      include: [
+        {
+          model: MessageModel,
+          attributes: {
+            exclude: [
+              'chatId',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+          include: [
+            {
+              model: FileModel,
+              attributes: {
+                exclude: [
+                  'messageId',
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (
+      !instance ||
+      !(
+        user.id == instance.toJSON().clientId ||
+        user.id == instance.toJSON().adminId
+      )
+    ) {
+      throw CommonException.NotFound(this.model.tableName);
+    }
+
+    return instance.toJSON();
+  }
+
   async updateById(data: ChatDto) {
     const instance = await this.model.findOne({
       where: { id: data.id },
@@ -296,7 +355,7 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     }
 
     if (data.clientId) {
-      await this.clientService.findById(data.clientId);
+      data.clientId = undefined;
     }
 
     return (await (await instance.update(data)).reload()).toJSON();
