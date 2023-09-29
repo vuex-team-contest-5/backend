@@ -39,14 +39,5 @@ export class OrderDto extends BaseDto {
   })
   productId: string;
 
-  // @ApiProperty({
-  //   description: 'The ID of the client to which this order belongs.',
-  //   type: 'string',
-  //   example: '12345678',
-  // })
-  // @IsOptional({ groups: [OrderDtoGroup.UPDATE] })
-  // @IsUUID('4', {
-  //   groups: [OrderDtoGroup.CREATE, OrderDtoGroup.UPDATE],
-  // })
   clientId: string;
 }

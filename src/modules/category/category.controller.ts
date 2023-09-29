@@ -18,6 +18,7 @@ import {
   CategoryPagingDto,
 } from './category.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
 
 @Controller('category')
 @ApiTags('Category')
@@ -25,8 +26,8 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  @UseGuards(JwtAuthGuard)
   async create(
     @Body(new MyValidationPipe([CategoryDtoGroup.CREATE]))
     data: CategoryDto,
@@ -39,8 +40,8 @@ export class CategoryController {
     type: 'string',
     example: 'product',
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([CategoryDtoGroup.PAGINATION]))
     query: CategoryPagingDto,
@@ -48,14 +49,14 @@ export class CategoryController {
     return this.categoryService.findAll(query);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch()
-  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new MyValidationPipe([CategoryDtoGroup.UPDATE]))
     data: CategoryDto,
@@ -63,8 +64,8 @@ export class CategoryController {
     return this.categoryService.updateById(data);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.categoryService.deleteById(id);
   }
