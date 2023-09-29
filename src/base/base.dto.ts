@@ -17,7 +17,7 @@ export class BaseDto {
     type: 'string',
     example: '12345678',
   })
-  @IsOptional({ groups: [BaseDtoGroup.PAGINATION] })
+  @IsOptional({ groups: [BaseDtoGroup.UPDATE, BaseDtoGroup.PAGINATION] })
   @IsUUID('4', {
     groups: [
       BaseDtoGroup.UPDATE,

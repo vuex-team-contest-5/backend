@@ -7,12 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TypeService } from './type.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Auth } from '../../auth/auth.decorator';
 import { TypeDto, TypeDtoGroup, TypePagingDto } from './type.dto';
 import { MyValidationPipe } from 'src/common/validators/validation.pipe';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('type')
 @ApiTags('Type')
@@ -21,7 +22,7 @@ export class TypeController {
   constructor(private readonly typeService: TypeService) {}
 
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async create(
     @Body(new MyValidationPipe([TypeDtoGroup.CREATE]))
     data: TypeDto,
@@ -30,7 +31,7 @@ export class TypeController {
   }
 
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([TypeDtoGroup.PAGINATION]))
     query: TypePagingDto,
@@ -39,13 +40,13 @@ export class TypeController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.typeService.findById(id);
   }
 
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new MyValidationPipe([TypeDtoGroup.UPDATE]))
     data: TypeDto,
@@ -54,7 +55,7 @@ export class TypeController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.typeService.deleteById(id);
   }

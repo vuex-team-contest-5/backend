@@ -7,12 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { ChatDto, ChatDtoGroup, ChatPagingDto } from './chat.dto';
-import { Auth } from '../../auth/auth.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('chat')
 @ApiTags('Chat')
@@ -21,7 +22,7 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async create(
     @Body(new MyValidationPipe([ChatDtoGroup.CREATE]))
     data: ChatDto,
@@ -41,7 +42,7 @@ export class ChatController {
     required: false,
   })
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([ChatDtoGroup.PAGINATION]))
     query: ChatPagingDto,
@@ -50,13 +51,13 @@ export class ChatController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.chatService.findById(id);
   }
 
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new MyValidationPipe([ChatDtoGroup.UPDATE]))
     data: ChatDto,
@@ -65,7 +66,7 @@ export class ChatController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.chatService.deleteById(id);
   }

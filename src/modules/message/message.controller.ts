@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  UseGuards,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import {
@@ -20,9 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { MessageDto, MessageDtoGroup, MessagePagingDto } from './message.dto';
-import { Auth } from '../../auth/auth.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImagesValidationPipe } from '../../common/validators/images-validation.pipe';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('message')
 @ApiTags('Message')
@@ -69,7 +70,7 @@ export class MessageController {
     },
   })
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FilesInterceptor('images', 5))
   async create(
     @Body(new MyValidationPipe([MessageDtoGroup.CREATE])) data: MessageDto,
@@ -84,7 +85,7 @@ export class MessageController {
     example: '12345678',
   })
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([MessageDtoGroup.PAGINATION]))
     query: MessagePagingDto,
@@ -93,7 +94,7 @@ export class MessageController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.messageService.findById(id);
   }
@@ -142,7 +143,7 @@ export class MessageController {
     },
   })
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FilesInterceptor('images', 5))
   async update(
     @Body(new MyValidationPipe([MessageDtoGroup.UPDATE])) data: MessageDto,
@@ -152,7 +153,7 @@ export class MessageController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.messageService.deleteById(id);
   }

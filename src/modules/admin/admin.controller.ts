@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -16,6 +17,7 @@ import { AdminDto, AdminDtoGroup, AdminPagingDto } from './admin.dto';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('admin')
 @ApiTags('Admin')
@@ -75,7 +77,7 @@ export class AdminController {
     },
   })
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([AdminDtoGroup.CREATE])) data: AdminDto,
@@ -85,7 +87,7 @@ export class AdminController {
   }
 
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([AdminDtoGroup.PAGINATION]))
     query: AdminPagingDto,
@@ -94,7 +96,7 @@ export class AdminController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.adminService.findById(id);
   }
@@ -149,7 +151,7 @@ export class AdminController {
     },
   })
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Body(new MyValidationPipe([AdminDtoGroup.UPDATE])) data: AdminDto,
@@ -159,7 +161,7 @@ export class AdminController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.adminService.deleteById(id);
   }

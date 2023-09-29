@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import {
@@ -22,6 +23,7 @@ import { TeacherDto, TeacherDtoGroup, TeacherPagingDto } from './teacher.dto';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('teacher')
 @ApiTags('Teacher')
@@ -111,7 +113,7 @@ export class TeacherController {
     },
   })
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([TeacherDtoGroup.CREATE])) data: TeacherDto,
@@ -127,7 +129,7 @@ export class TeacherController {
     required: false,
   })
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([TeacherDtoGroup.PAGINATION]))
     query: TeacherPagingDto,
@@ -136,7 +138,7 @@ export class TeacherController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.teacherService.findById(id);
   }
@@ -216,7 +218,7 @@ export class TeacherController {
     },
   })
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Body(new MyValidationPipe([TeacherDtoGroup.UPDATE])) data: TeacherDto,
@@ -226,7 +228,7 @@ export class TeacherController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.teacherService.deleteById(id);
   }

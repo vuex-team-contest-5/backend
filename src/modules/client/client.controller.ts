@@ -9,6 +9,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import {
@@ -23,6 +25,10 @@ import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { ClientDto, ClientDtoGroup, ClientPagingDto } from './client.dto';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
 import { OrderDto } from './order/order.dto';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
+import { Request } from 'express';
+import { ClientGuard } from '../../auth/guards/client.guard';
 
 @Controller('client')
 @ApiTags('Client')
@@ -111,8 +117,8 @@ export class ClientController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  // @Auth()
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([ClientDtoGroup.CREATE])) data: ClientDto,
@@ -127,8 +133,8 @@ export class ClientController {
     example: null,
     required: false,
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
-  // @Auth()
   async findAll(
     @Query(new MyValidationPipe([ClientDtoGroup.PAGINATION]))
     query: ClientPagingDto,
@@ -137,8 +143,9 @@ export class ClientController {
   }
 
   @Get(':id')
-  // @Auth()
-  async findOne(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Req() req: Request, @Param('id') id: string) {
+    id = req.user.role == 'client' ? req.user.id : id;
     return this.clientService.findById(id);
   }
 
@@ -146,12 +153,11 @@ export class ClientController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['id'],
       properties: {
         id: {
           type: 'string',
-          example: '13245678',
-          description: 'The ID of the client.',
+          example: '12345678',
+          description: 'The ID.',
         },
         image: {
           type: 'string',
@@ -216,32 +222,36 @@ export class ClientController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard)
   @Patch()
-  // @Auth()
   @UseInterceptors(FileInterceptor('image'))
   async update(
+    @Req() req: Request,
     @Body(new MyValidationPipe([ClientDtoGroup.UPDATE])) data: ClientDto,
     @UploadedFile(new ImageValidationPipe()) image: Express.Multer.File,
   ) {
+    data.id = req.user.role == 'client' ? req.user.id : data.id;
     return this.clientService.updateById(data, image);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  // @Auth()
   async remove(@Param('id') id: string) {
     return this.clientService.deleteById(id);
   }
 
   @Post('order')
-  // @Auth()
+  @UseGuards(JwtAuthGuard, ClientGuard)
   async orderProduct(
+    @Req() req: Request,
     @Body(new MyValidationPipe([ClientDtoGroup.CREATE])) data: OrderDto,
   ) {
+    data.clientId = req.user.id;
     return this.clientService.orderProduct(data);
   }
 
   @Delete('order/:id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard, ClientGuard)
   async removeOrder(@Param('id') id: string) {
     return this.clientService.removeOrder(id);
   }

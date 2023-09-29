@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { AdminModule } from '../modules/admin/admin.module';
 import { RedisModule } from './redis/redis.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

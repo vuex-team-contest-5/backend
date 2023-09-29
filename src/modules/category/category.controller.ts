@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -16,7 +17,7 @@ import {
   CategoryDtoGroup,
   CategoryPagingDto,
 } from './category.dto';
-import { Auth } from '../../auth/auth.decorator';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('category')
 @ApiTags('Category')
@@ -25,7 +26,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async create(
     @Body(new MyValidationPipe([CategoryDtoGroup.CREATE]))
     data: CategoryDto,
@@ -39,7 +40,7 @@ export class CategoryController {
     example: 'product',
   })
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([CategoryDtoGroup.PAGINATION]))
     query: CategoryPagingDto,
@@ -48,13 +49,13 @@ export class CategoryController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.categoryService.findById(id);
   }
 
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async update(
     @Body(new MyValidationPipe([CategoryDtoGroup.UPDATE]))
     data: CategoryDto,
@@ -63,7 +64,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.categoryService.deleteById(id);
   }

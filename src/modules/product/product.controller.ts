@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
@@ -22,6 +23,7 @@ import { ProductDto, ProductDtoGroup, ProductPagingDto } from './product.dto';
 import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('product')
 @ApiTags('Product')
@@ -93,7 +95,7 @@ export class ProductController {
     },
   })
   @Post()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([ProductDtoGroup.CREATE])) data: ProductDto,
@@ -114,7 +116,7 @@ export class ProductController {
     required: false,
   })
   @Get()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([ProductDtoGroup.PAGINATION]))
     query: ProductPagingDto,
@@ -123,7 +125,7 @@ export class ProductController {
   }
 
   @Get(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param('id') id: string) {
     return this.productService.findById(id);
   }
@@ -188,7 +190,7 @@ export class ProductController {
     },
   })
   @Patch()
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
     @Body(new MyValidationPipe([ProductDtoGroup.UPDATE])) data: ProductDto,
@@ -198,7 +200,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  // @Auth()
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.productService.deleteById(id);
   }
