@@ -16,12 +16,16 @@ import { RegisterDto } from './dto/register.dto';
 import { OtpDto } from './dto/otp.dto';
 import { JwtPayloadDto } from './dto/jwt.dto';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { ProductModel } from '../modules/product/product.model';
+import { TeacherModel } from '../modules/teacher/teacher.model';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(AdminModel) readonly adminModel: typeof AdminModel,
     @InjectModel(ClientModel) readonly clientModel: typeof ClientModel,
+    @InjectModel(ProductModel) readonly productModel: typeof ProductModel,
+    @InjectModel(TeacherModel) readonly teacherModel: typeof TeacherModel,
     private readonly adminService: AdminService,
     private readonly clientService: ClientService,
     private readonly mailService: MailService,
@@ -160,6 +164,24 @@ export class AuthService {
         id: ownerId,
         role: otp.role,
       }),
+    };
+  }
+
+  async getCountInfo() {
+    const poructCount = await this.productModel.count({
+      where: { type: 'product' },
+    });
+    const clientCount = await this.clientModel.count();
+    const teacherCount = await this.teacherModel.count();
+    const equipmentCount = await this.productModel.count({
+      where: { type: 'equipment' },
+    });
+
+    return {
+      poructCount,
+      clientCount,
+      teacherCount,
+      equipmentCount,
     };
   }
 

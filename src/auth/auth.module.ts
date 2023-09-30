@@ -10,10 +10,17 @@ import { AdminModule } from '../modules/admin/admin.module';
 import { RedisModule } from './redis/redis.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ProductModel } from '../modules/product/product.model';
+import { TeacherModel } from '../modules/teacher/teacher.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([ClientModel, AdminModel]),
+    SequelizeModule.forFeature([
+      ClientModel,
+      AdminModel,
+      ProductModel,
+      TeacherModel,
+    ]),
     AdminModule,
     ClientModule,
     MailModule,

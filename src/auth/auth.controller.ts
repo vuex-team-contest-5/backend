@@ -1,10 +1,11 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MyValidationPipe } from '../common/validators/validation.pipe';
 import { RegisterDto, RegisterDtoGroup } from './dto/register.dto';
 import { LoginDto, LoginDtoGroup } from './dto/login.dto';
 import { OtpDto, OtpDtoGroup } from './dto/otp.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -36,5 +37,11 @@ export class AuthController {
   @Post('otp/verify')
   async verifyOTP(@Body(new MyValidationPipe([OtpDtoGroup.OTP])) data: OtpDto) {
     return this.authService.verifyOTP(data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('count/info')
+  async getCountInfo() {
+    return this.authService.getCountInfo();
   }
 }
