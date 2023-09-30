@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BaseDto, BaseDtoGroup } from '../../base/base.dto';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { PagingDto } from '../../common/dto/paging.dto';
+import { ChatDto } from '../chat/chat.dto';
 
 export class MessageDtoGroup extends BaseDtoGroup {}
 
@@ -23,17 +24,6 @@ export class MessageDto extends BaseDto {
   body: string;
 
   @ApiProperty({
-    description: 'The ID of the owner to which this message belongs.',
-    type: 'string',
-    example: '12345678',
-  })
-  @IsOptional({ groups: [MessageDtoGroup.UPDATE] })
-  @IsUUID('4', {
-    groups: [MessageDtoGroup.CREATE, MessageDtoGroup.UPDATE],
-  })
-  ownerId: string;
-
-  @ApiProperty({
     description: 'The ID of the chat to which this message belongs.',
     type: 'string',
     example: '12345678',
@@ -44,5 +34,9 @@ export class MessageDto extends BaseDto {
   })
   chatId: string;
 
+  ownerId: string;
+
   isClient: boolean;
+
+  chat: ChatDto;
 }

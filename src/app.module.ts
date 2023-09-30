@@ -8,7 +8,6 @@ import { ClientModule } from './modules/client/client.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
 import { AdminModule } from './modules/admin/admin.module';
-import { ImageModule } from './modules/image/image.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { MessageModule } from './modules/message/message.module';
 import { AuthModule } from './auth/auth.module';

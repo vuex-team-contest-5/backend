@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import {
@@ -24,6 +25,7 @@ import { MessageDto, MessageDtoGroup, MessagePagingDto } from './message.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImagesValidationPipe } from '../../common/validators/images-validation.pipe';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Request } from 'express';
 
 @Controller('message')
 @ApiTags('Message')
@@ -35,7 +37,7 @@ export class MessageController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['body', 'status', 'ownerId', 'chatId'],
+      required: ['body', 'status', 'chatId'],
       properties: {
         images: {
           type: 'array',
@@ -56,11 +58,6 @@ export class MessageController {
           example: 'true',
           description: 'The status of the message.',
         },
-        ownerId: {
-          type: 'string',
-          example: '12345678',
-          description: 'The ID of the owner to which this message belongs.',
-        },
         chatId: {
           type: 'string',
           example: '12345678',
@@ -69,14 +66,16 @@ export class MessageController {
       },
     },
   })
-  @Post()
   @UseGuards(JwtAuthGuard)
+  @Post()
   @UseInterceptors(FilesInterceptor('images', 5))
   async create(
+    @Req() req: Request,
     @Body(new MyValidationPipe([MessageDtoGroup.CREATE])) data: MessageDto,
     @UploadedFiles(new ImagesValidationPipe()) images: Express.Multer.File[],
   ) {
-    return this.messageService.create(data, images);
+    data.ownerId = req.user.id;
+    return this.messageService.create(data, images, req.user);
   }
 
   @ApiQuery({
@@ -84,17 +83,18 @@ export class MessageController {
     type: 'string',
     example: '12345678',
   })
-  @Get()
   @UseGuards(JwtAuthGuard)
+  @Get()
   async findAll(
+    @Req() req: Request,
     @Query(new MyValidationPipe([MessageDtoGroup.PAGINATION]))
     query: MessagePagingDto,
   ) {
-    return this.messageService.findAll(query);
+    return this.messageService.findAll(query, req.user);
   }
 
-  @Get(':id')
   @UseGuards(JwtAuthGuard)
+  @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.messageService.findById(id);
   }
@@ -129,32 +129,24 @@ export class MessageController {
           example: 'true',
           description: 'The status of the message.',
         },
-        ownerId: {
-          type: 'string',
-          example: '12345678',
-          description: 'The ID of the owner to which this message belongs.',
-        },
-        chatId: {
-          type: 'string',
-          example: '12345678',
-          description: 'The ID of the chat to which this message belongs.',
-        },
       },
     },
   })
-  @Patch()
   @UseGuards(JwtAuthGuard)
+  @Patch()
   @UseInterceptors(FilesInterceptor('images', 5))
   async update(
+    @Req() req: Request,
     @Body(new MyValidationPipe([MessageDtoGroup.UPDATE])) data: MessageDto,
     @UploadedFiles(new ImagesValidationPipe()) images: Express.Multer.File[],
   ) {
+    data.ownerId = req.user.id;
     return this.messageService.updateById(data, images);
   }
 
-  @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: string) {
-    return this.messageService.deleteById(id);
+  @Delete(':id')
+  async remove(@Req() req: Request, @Param('id') id: string) {
+    return this.messageService.deleteById(id, req.user);
   }
 }

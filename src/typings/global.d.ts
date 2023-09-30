@@ -4,6 +4,7 @@ export {};
 
 declare global {
   interface PagingSuccessResponse<T = any> {
+    chat?: {};
     data: T[];
     meta: {
       limit: number;

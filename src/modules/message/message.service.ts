@@ -16,6 +16,8 @@ import { ChatService } from './../chat/chat.service';
 import { ChatModel } from '../chat/chat.model';
 import { FileModel } from './file/file.model';
 import { ImageService } from '../image/image.service';
+import { ReqUserInterface } from '../../auth/dto/req.dto';
+import { ChatDto } from '../chat/chat.dto';
 
 @Injectable()
 export class MessageService extends BaseService<MessageDto, MessageDto> {
@@ -31,15 +33,23 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
     super(model);
   }
 
-  async create(data: MessageDto, images?: Express.Multer.File[]) {
-    const chat = await this.chatService.findById(data.chatId);
+  async create(
+    data: MessageDto,
+    images?: Express.Multer.File[],
+    user?: ReqUserInterface,
+  ) {
+    let chat: ChatDto = <ChatDto>{};
 
-    if (chat.adminId !== data.ownerId && chat.clientId !== data.ownerId) {
-      throw CommonException.NotFound('Owner');
+    try {
+      chat = await this.chatService.findById(data.chatId, user);
+    } catch (error) {
+      throw error;
     }
 
+    chat.message = undefined;
+
     data.id = randomUUID();
-    data.isClient = chat.clientId === data.ownerId;
+    data.isClient = chat.client.id === data.ownerId;
 
     if (images) {
       const fileNames = [];
@@ -167,7 +177,20 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
     return instance.toJSON();
   }
 
-  async findAll(query: MessagePagingDto): Promise<ResponsePaging<MessageDto>> {
+  async findAll(
+    query: MessagePagingDto,
+    user?: ReqUserInterface,
+  ): Promise<ResponsePaging<MessageDto>> {
+    let chat: ChatDto = <ChatDto>{};
+
+    try {
+      chat = await this.chatService.findById(query.chatId, user);
+    } catch (error) {
+      throw error;
+    }
+
+    chat.message = undefined;
+
     query.limit = Number(query.limit || 10);
     query.page = Number(query.page || 1);
 
@@ -208,6 +231,7 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
         totalPages: Math.ceil(instance.count / query.limit),
         totalCount: instance.count,
       },
+      chat,
       data: instance.rows.map((row) => row.toJSON()),
     };
   }
@@ -308,12 +332,29 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
       ],
     });
 
-    if (!instance) {
+    console.log(data.ownerId);
+    console.log(instance.toJSON().chat.client.id);
+    console.log(instance.toJSON().chat.admin.id);
+    console.log(instance.toJSON().isClient);
+
+    if (
+      !instance ||
+      !(
+        data.ownerId == instance.toJSON().chat.client.id ||
+        data.ownerId == instance.toJSON().chat.admin.id
+      ) ||
+      (instance.toJSON().isClient &&
+        data.ownerId == instance.toJSON().chat.admin.id)
+    ) {
       throw CommonException.NotFound(this.model.tableName);
     }
 
     if (data.chatId) {
-      await this.chatService.findById(data.chatId);
+      data.chatId = undefined;
+    }
+
+    if (data.isClient) {
+      data.isClient = undefined;
     }
 
     if (!images) {
@@ -358,10 +399,49 @@ export class MessageService extends BaseService<MessageDto, MessageDto> {
 
       await tr.commit();
 
-      return (await instance.reload()).toJSON();
+      return (
+        await instance.reload({
+          attributes: {
+            exclude: [
+              'chatId',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+        })
+      ).toJSON();
     } catch (error) {
       await tr.rollback();
       throw CommonException.UnknownError(error, 400);
     }
+  }
+
+  async deleteById(id: any, user?: ReqUserInterface) {
+    const instance = await this.model.findOne({
+      where: { id },
+      attributes: ['id', 'isClient'],
+      include: [
+        {
+          model: ChatModel,
+          attributes: ['id', 'clientId', 'adminId'],
+        },
+      ],
+    });
+
+    if (
+      !instance ||
+      !(
+        user.id == instance.toJSON().chat.clientId ||
+        user.id == instance.toJSON().chat.adminId
+      ) ||
+      (instance.toJSON().isClient && user.id == instance.toJSON().chat.adminId)
+    ) {
+      throw CommonException.NotFound(this.model.tableName);
+    }
+
+    await instance.update({ status: false });
+    return { id };
   }
 }

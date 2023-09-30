@@ -220,6 +220,8 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
       where: { id },
       attributes: {
         exclude: [
+          'adminId',
+          'clientId',
           'createdAt',
           'createdBy',
           'updatedAt',
@@ -228,6 +230,63 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
         ],
       },
       include: [
+        {
+          model: AdminModel,
+          attributes: {
+            exclude: [
+              'hashedPassword',
+              'createdAt',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+        },
+        {
+          model: ClientModel,
+          attributes: {
+            exclude: [
+              'hashedPassword',
+              'teacherId',
+              'createdAt',
+              'createdBy',
+              'updatedAt',
+              'deletedAt',
+              'deletedBy',
+            ],
+          },
+          include: [
+            {
+              model: TeacherModel,
+              attributes: {
+                exclude: [
+                  'hashedPassword',
+                  'typeId',
+                  'createdAt',
+                  'createdBy',
+                  'updatedAt',
+                  'deletedAt',
+                  'deletedBy',
+                ],
+              },
+              include: [
+                {
+                  model: TypeModel,
+                  attributes: {
+                    exclude: [
+                      'createdAt',
+                      'createdBy',
+                      'updatedAt',
+                      'deletedAt',
+                      'deletedBy',
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        },
         {
           model: MessageModel,
           attributes: {
@@ -261,8 +320,8 @@ export class ChatService extends BaseService<ChatDto, ChatDto> {
     if (
       !instance ||
       !(
-        user.id == instance.toJSON().clientId ||
-        user.id == instance.toJSON().adminId
+        user.id == instance.toJSON().client.id ||
+        user.id == instance.toJSON().admin.id
       )
     ) {
       throw CommonException.NotFound(this.model.tableName);

@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { BaseDto, BaseDtoGroup } from '../../base/base.dto';
 import { IsOptional, IsUUID } from 'class-validator';
 import { PagingDto } from '../../common/dto/paging.dto';
+import { ClientDto } from '../client/client.dto';
+import { AdminDto } from '../admin/admin.dto';
+import { MessageDto } from '../message/message.dto';
 
 export class ChatDtoGroup extends BaseDtoGroup {}
 
@@ -28,4 +31,10 @@ export class ChatDto extends BaseDto {
     groups: [ChatDtoGroup.CREATE],
   })
   clientId: string;
+
+  client: ClientDto;
+
+  admin: AdminDto;
+
+  message: MessageDto[];
 }
