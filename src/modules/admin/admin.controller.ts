@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
@@ -18,6 +19,8 @@ import { MyValidationPipe } from '../../common/validators/validation.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageValidationPipe } from '../../common/validators/image-validation.pipe';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { AdminGuard } from '../../auth/guards/admin.guard';
+import { Request } from 'express';
 
 @Controller('admin')
 @ApiTags('Admin')
@@ -76,8 +79,8 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body(new MyValidationPipe([AdminDtoGroup.CREATE])) data: AdminDto,
@@ -86,8 +89,8 @@ export class AdminController {
     return this.adminService.create(data, image);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
-  @UseGuards(JwtAuthGuard)
   async findAll(
     @Query(new MyValidationPipe([AdminDtoGroup.PAGINATION]))
     query: AdminPagingDto,
@@ -95,9 +98,10 @@ export class AdminController {
     return this.adminService.findAll(query);
   }
 
-  @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async findOne(@Param('id') id: string) {
+  @Get(':id')
+  async findOne(@Req() req: Request, @Param('id') id: string) {
+    id = req.user.role == 'admin' ? req.user.id : id;
     return this.adminService.findById(id);
   }
 
@@ -105,13 +109,7 @@ export class AdminController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['id'],
       properties: {
-        id: {
-          type: 'string',
-          example: '13245678',
-          description: 'The ID of the admin.',
-        },
         image: {
           type: 'string',
           format: 'binary',
@@ -150,18 +148,20 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch()
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async update(
+    @Req() req: Request,
     @Body(new MyValidationPipe([AdminDtoGroup.UPDATE])) data: AdminDto,
     @UploadedFile(new ImageValidationPipe()) image: Express.Multer.File,
   ) {
+    data.id = req.user.id;
     return this.adminService.updateById(data, image);
   }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
   async remove(@Param('id') id: string) {
     return this.adminService.deleteById(id);
   }
